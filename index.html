@@ -1,199 +1,248 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gblend Flappy - Cyberpunk Edition</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
-        
-        body {
-            margin: 0;
-            padding: 0;
-            overflow: hidden;
-            font-family: 'Press Start 2P', cursive;
-            background-color: #0f0e17;
-            color: #fffffe;
-        }
-        
-        #gameCanvas {
-            display: block;
-            background: linear-gradient(to bottom, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-        }
-        
-        .neon-text {
-            text-shadow: 0 0 5px #ff2a6d, 0 0 10px #d16ba5, 0 0 15px #05d9e8;
-        }
-        
-        .neon-border {
-            box-shadow: 0 0 10px #05d9e8, 0 0 20px #05d9e8, inset 0 0 10px #05d9e8;
-            border: 2px solid #05d9e8;
-        }
-        
-        .glow {
-            animation: glow 1.5s ease-in-out infinite alternate;
-        }
-        
-        @keyframes glow {
-            from {
-                text-shadow: 0 0 5px #fff, 0 0 10px #ff2a6d, 0 0 15px #ff2a6d;
-            }
-            to {
-                text-shadow: 0 0 10px #fff, 0 0 20px #ff2a6d, 0 0 30px #ff2a6d;
-            }
-        }
-        
-        .cyberpunk-btn {
-            background: linear-gradient(45deg, #ff2a6d, #d16ba5);
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            font-family: 'Press Start 2P', cursive;
-            font-size: 14px;
-            cursor: pointer;
-            transition: all 0.3s;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .cyberpunk-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(255, 42, 109, 0.4);
-        }
-        
-        .cyberpunk-btn:active {
-            transform: translateY(0);
-        }
-        
-        .cyberpunk-btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            transition: 0.5s;
-        }
-        
-        .cyberpunk-btn:hover::before {
-            left: 100%;
-        }
-        
-        .pipe {
-            background: linear-gradient(to right, #05d9e8, #005678);
-            border-left: 3px solid #ff2a6d;
-            border-right: 3px solid #ff2a6d;
-        }
-    </style>
-</head>
-<body class="flex items-center justify-center min-h-screen bg-gray-900">
-    <div class="relative">
-        <canvas id="gameCanvas" width="400" height="600"></canvas>
-        
-        <!-- Start Screen -->
-        <div id="startScreen" class="absolute inset-0 flex flex-col items-center justify-center bg-black bg-opacity-70">
-            <h1 class="text-4xl mb-6 neon-text glow">GBLEND FLAPPY</h1>
-            <p class="mb-8 text-center px-4">Cyberpunk Edition</p>
-            <button id="startBtn" class="cyberpunk-btn neon-border">START GAME</button>
-            <div class="mt-8 text-xs text-center">
-                <p>Controls: Tap/Click to jump</p>
-                <p class="mt-2 text-cyan-300">Easier gameplay for beginners!</p>
-            </div>
-        </div>
-        
-        <!-- Game Over Screen -->
-        <div id="gameOverScreen" class="absolute inset-0 flex flex-col items-center justify-center bg-black bg-opacity-80 hidden">
-            <h2 class="text-3xl mb-4 neon-text">GAME OVER</h2>
-            <p id="finalScore" class="text-2xl mb-6">Score: 0</p>
-            <button id="restartBtn" class="cyberpunk-btn neon-border mb-4">PLAY AGAIN</button>
-            <p class="text-xs mt-2 text-purple-300">"The city never sleeps... neither should you."</p>
-        </div>
-        
-        <!-- Score Display -->
-        <div id="scoreDisplay" class="absolute top-4 left-0 right-0 text-center text-2xl hidden neon-text">0</div>
-    </div>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sign Global - Impact Flight</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const canvas = document.getElementById('gameCanvas');
-            const ctx = canvas.getContext('2d');
-            const startScreen = document.getElementById('startScreen');
-            const gameOverScreen = document.getElementById('gameOverScreen');
-            const startBtn = document.getElementById('startBtn');
-            const restartBtn = document.getElementById('restartBtn');
-            const scoreDisplay = document.getElementById('scoreDisplay');
-            const finalScore = document.getElementById('finalScore');
-            
-            // Game variables with easier settings
-            let bird = {
-                x: 100,
-                y: canvas.height / 2,
-                width: 40,
-                height: 30,
-                velocity: 0,
-                gravity: 0.3,  // Reduced gravity for slower falling
-                jumpForce: -6,  // Reduced jump height
-                color: '#ff2a6d'
-            };
-            
-            let pipes = [];
-            let score = 0;
-            let gameSpeed = 2;  // Reduced horizontal speed
-            let pipeGap = 180;  // Increased gap between pipes
-            let pipeDistance = 200;  // Reduced distance between pipes
-            let gameRunning = false;
-            let difficultyTimer = 0;
-            let difficultyInterval = 30000; // 30 seconds before difficulty increases
-            
-            // Cyberpunk city background elements
-            let buildings = [];
-            for (let i = 0; i < 10; i++) {
-                buildings.push({
-                    x: i * 150,
-                    height: 100 + Math.random() * 200,
-                    width: 100 + Math.random() * 100,
-                    color: `hsl(${200 + Math.random() * 40}, 70%, 30%)`
-                });
-            }
-            
-            // Neon signs in background
-            let neonSigns = [];
-            for (let i = 0; i < 5; i++) {
-                neonSigns.push({
-                    x: i * 300 + 50,
-                    y: canvas.height - 150 - Math.random() * 100,
-                    text: ['NEON', 'CYBER', 'FLUX', 'PUNK', 'GLITCH'][i],
-                    color: `hsl(${Math.random() * 360}, 100%, 70%)`
-                });
-            }
-            
-            // Draw cyberpunk bird
-            function drawBird() {
-                // Body
-                ctx.fillStyle = bird.color;
-                ctx.beginPath();
-                ctx.ellipse(bird.x, bird.y, bird.width / 2, bird.height / 2, 0, 0, Math.PI * 2);
-                ctx.fill();
-                
-                // Eye
-                ctx.fillStyle = '#05d9e8';
-                ctx.beginPath();
-                ctx.arc(bird.x + 10, bird.y - 5, 5, 0, Math.PI * 2);
-                ctx.fill();
-                
-                // Cybernetic wing
-                ctx.strokeStyle = '#05d9e8';
-                ctx.lineWidth = 3;
-                ctx.beginPath();
-                ctx.moveTo(bird.x - 15, bird.y);
-                ctx.lineTo(bird.x - 25, bird.y + 10);
-                ctx.lineTo(bird.x - 20, bird.y + 5);
-                ctx.stroke();
-                
-                // Glow effect
-                ctx.shadowColor = '#ff2a6d';
-                ctx.shadowBlur = 15;
-                ctx.beginPath();
-                ctx.ellipse(bird.x, bird.y, bird.width / 2
+    body {
+      background: linear-gradient(to bottom, #fff5e1, #ffd8a8);
+      font-family: 'Segoe UI', sans-serif;
+      text-align: center;
+      overflow: hidden;
+    }
+
+    canvas {
+      display: block;
+      margin: auto;
+      background-color: #a3d8ff;
+      border: 5px solid #FF7F00;
+      border-radius: 12px;
+      margin-top: 30px;
+    }
+
+    #startScreen, #gameOverScreen {
+      position: absolute;
+      top: 20%;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: rgba(255, 255, 255, 0.95);
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      z-index: 10;
+    }
+
+    #gameOverScreen {
+      display: none;
+    }
+
+    button {
+      background-color: #FF7F00;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      font-size: 18px;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+
+    button:hover {
+      background-color: #e76e00;
+    }
+
+    h1 {
+      color: #FF7F00;
+      margin-bottom: 10px;
+    }
+
+    #scoreDisplay {
+      position: absolute;
+      top: 20px;
+      right: 30px;
+      font-size: 26px;
+      font-weight: bold;
+      color: #fff;
+      background-color: #FF7F00;
+      padding: 10px 20px;
+      border-radius: 12px;
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div id="startScreen">
+    <h1>🚀 Welcome to Impact Flight</h1>
+    <p>Fly the Sign man past the pipes. Click or press SPACE to flap!</p>
+    <button id="startBtn">START GAME</button>
+  </div>
+
+  <div id="gameOverScreen">
+    <h1>🌍 Mission Over</h1>
+    <p id="finalScore">Score: 0</p>
+    <button id="restartBtn">RESTART</button>
+  </div>
+
+  <canvas id="gameCanvas" width="480" height="640"></canvas>
+  <div id="scoreDisplay" class="hidden">0</div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const canvas = document.getElementById('gameCanvas');
+      const ctx = canvas.getContext('2d');
+      const startScreen = document.getElementById('startScreen');
+      const gameOverScreen = document.getElementById('gameOverScreen');
+      const startBtn = document.getElementById('startBtn');
+      const restartBtn = document.getElementById('restartBtn');
+      const scoreDisplay = document.getElementById('scoreDisplay');
+      const finalScore = document.getElementById('finalScore');
+
+      let bird, pipes, score, gameSpeed, gameRunning, lastPipeTime, pipeGap;
+      const gravity = 0.3;
+      const jumpForce = -6;
+      const pipeInterval = 1500;
+
+      function initGame() {
+        bird = {
+          x: 80,
+          y: canvas.height / 2,
+          width: 40,
+          height: 30,
+          velocity: 0
+        };
+        pipes = [];
+        score = 0;
+        gameSpeed = 2;
+        lastPipeTime = Date.now();
+        pipeGap = 180;
+        gameRunning = true;
+        scoreDisplay.textContent = "0";
+        scoreDisplay.classList.remove('hidden');
+      }
+
+      function drawBird() {
+        ctx.fillStyle = '#ff2a6d';
+        ctx.beginPath();
+        ctx.ellipse(bird.x, bird.y, bird.width / 2, bird.height / 2, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = '#05d9e8';
+        ctx.beginPath();
+        ctx.arc(bird.x + 10, bird.y - 5, 5, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      function drawPipes() {
+        ctx.fillStyle = '#05d9e8';
+        pipes.forEach(pipe => {
+          ctx.fillRect(pipe.x, 0, pipe.width, pipe.top);
+          ctx.fillRect(pipe.x, pipe.bottom, pipe.width, canvas.height - pipe.bottom);
+        });
+      }
+
+      function updateGame() {
+        if (!gameRunning) return;
+
+        bird.velocity += gravity;
+        bird.y += bird.velocity;
+
+        const now = Date.now();
+        if (now - lastPipeTime > pipeInterval) {
+          const topHeight = Math.random() * (canvas.height - pipeGap - 100) + 50;
+          pipes.push({
+            x: canvas.width,
+            width: 50,
+            top: topHeight,
+            bottom: topHeight + pipeGap,
+            passed: false
+          });
+          lastPipeTime = now;
+        }
+
+        pipes.forEach(pipe => {
+          pipe.x -= gameSpeed;
+        });
+
+        pipes = pipes.filter(pipe => pipe.x + pipe.width > 0);
+
+        for (let pipe of pipes) {
+          if (
+            bird.x + bird.width / 2 > pipe.x &&
+            bird.x - bird.width / 2 < pipe.x + pipe.width &&
+            (bird.y - bird.height / 2 < pipe.top || bird.y + bird.height / 2 > pipe.bottom)
+          ) {
+            endGame();
+            return;
+          }
+        }
+
+        if (bird.y + bird.height / 2 > canvas.height || bird.y - bird.height / 2 < 0) {
+          endGame();
+          return;
+        }
+
+        pipes.forEach(pipe => {
+          if (!pipe.passed && bird.x > pipe.x + pipe.width) {
+            pipe.passed = true;
+            score++;
+            scoreDisplay.textContent = score;
+          }
+        });
+      }
+
+      function render() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        drawBird();
+        drawPipes();
+      }
+
+      function gameLoop() {
+        if (gameRunning) {
+          updateGame();
+          render();
+          requestAnimationFrame(gameLoop);
+        }
+      }
+
+      function endGame() {
+        gameRunning = false;
+        gameOverScreen.style.display = 'block';
+        scoreDisplay.classList.add('hidden');
+        finalScore.textContent = `Score: ${score}`;
+      }
+
+      function flap() {
+        if (!gameRunning) return;
+        bird.velocity = jumpForce;
+      }
+
+      canvas.addEventListener('click', flap);
+      document.addEventListener('keydown', (e) => {
+        if (e.code === 'Space') flap();
+      });
+
+      startBtn.addEventListener('click', () => {
+        startScreen.style.display = 'none';
+        initGame();
+        gameLoop();
+      });
+
+      restartBtn.addEventListener('click', () => {
+        gameOverScreen.style.display = 'none';
+        initGame();
+        gameLoop();
+      });
+    });
+  </script>
+</body>
+</html>
