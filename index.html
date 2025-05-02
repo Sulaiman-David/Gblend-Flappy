@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gblend Flappy - Fluent Edition</title>
+    <title>Gblend Flappy</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
@@ -86,19 +86,36 @@
             border-left: 3px solid #ff2a6d;
             border-right: 3px solid #ff2a6d;
         }
+        
+        .gblend-label {
+            position: absolute;
+            bottom: 20px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 24px;
+            color: #05d9e8;
+            text-shadow: 0 0 10px #05d9e8;
+            opacity: 0.7;
+            pointer-events: none;
+        }
     </style>
 </head>
 <body class="flex items-center justify-center min-h-screen bg-gray-900">
     <div class="relative">
         <canvas id="gameCanvas" width="400" height="600"></canvas>
         
+        <!-- gblend label -->
+        <div class="gblend-label">gblend</div>
+        
         <!-- Start Screen -->
         <div id="startScreen" class="absolute inset-0 flex flex-col items-center justify-center bg-black bg-opacity-70">
             <h1 class="text-4xl mb-6 neon-text glow">GBLEND FLAPPY</h1>
-            <p class="mb-8 text-center px-4">Fluent Edition</p>
+            <p class="mb-8 text-center px-4">Cyberpunk Edition</p>
             <button id="startBtn" class="cyberpunk-btn neon-border">START GAME</button>
             <div class="mt-8 text-xs text-center">
                 <p>Controls: Tap/Click to jump</p>
+                <p class="mt-2 text-cyan-300">Easier gameplay for beginners!</p>
             </div>
         </div>
         
@@ -107,7 +124,7 @@
             <h2 class="text-3xl mb-4 neon-text">GAME OVER</h2>
             <p id="finalScore" class="text-2xl mb-6">Score: 0</p>
             <button id="restartBtn" class="cyberpunk-btn neon-border mb-4">PLAY AGAIN</button>
-            <p class="text-xs mt-2 text-purple-300">"The Fluent city never sleeps... neither should you."</p>
+            <p class="text-xs mt-2 text-purple-300">"The city never sleeps... neither should you."</p>
         </div>
         
         <!-- Score Display -->
@@ -153,169 +170,87 @@
                     x: i * 150,
                     height: 100 + Math.random() * 200,
                     width: 100 + Math.random() * 100,
-                    color: `hsl(${200 + Math.random() * 40}, 70%, 30%)`
+                    color: `hsl(${200 + Math.random() * 100}, 80%, 30%)`,
+                    windows: []
                 });
-            }
-            
-            // Neon signs in background
-            let neonSigns = [];
-            for (let i = 0; i < 5; i++) {
-                neonSigns.push({
-                    x: i * 300 + 50,
-                    y: canvas.height - 150 - Math.random() * 100,
-                    text: ['NEON', 'CYBER', 'FLUX', 'PUNK', 'GLITCH'][i],
-                    color: `hsl(${Math.random() * 360}, 100%, 70%)`
-                });
-            }
-            
-            // Draw cyberpunk bird
-            function drawBird() {
-                // Body
-                ctx.fillStyle = bird.color;
-                ctx.beginPath();
-                ctx.ellipse(bird.x, bird.y, bird.width / 2, bird.height / 2, 0, 0, Math.PI * 2);
-                ctx.fill();
                 
-                // Eye
-                ctx.fillStyle = '#05d9e8';
-                ctx.beginPath();
-                ctx.arc(bird.x + 10, bird.y - 5, 5, 0, Math.PI * 2);
-                ctx.fill();
-                
-                // Cybernetic wing
-                ctx.strokeStyle = '#05d9e8';
-                ctx.lineWidth = 3;
-                ctx.beginPath();
-                ctx.moveTo(bird.x - 15, bird.y);
-                ctx.lineTo(bird.x - 25, bird.y + 10);
-                ctx.lineTo(bird.x - 20, bird.y + 5);
-                ctx.stroke();
-                
-                // Glow effect
-                ctx.shadowColor = '#ff2a6d';
-                ctx.shadowBlur = 15;
-                ctx.beginPath();
-                ctx.ellipse(bird.x, bird.y, bird.width / 2, bird.height / 2, 0, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.shadowBlur = 0;
-            }
-            
-            // Draw pipes with cyberpunk style
-            function drawPipes() {
-                pipes.forEach(pipe => {
-                    // Top pipe
-                    ctx.fillStyle = '#05d9e8';
-                    ctx.fillRect(pipe.x, 0, pipe.width, pipe.top);
-                    
-                    // Bottom pipe
-                    ctx.fillStyle = '#005678';
-                    ctx.fillRect(pipe.x, pipe.bottom, pipe.width, canvas.height - pipe.bottom);
-                    
-                    // Neon borders
-                    ctx.strokeStyle = '#ff2a6d';
-                    ctx.lineWidth = 2;
-                    ctx.strokeRect(pipe.x, 0, pipe.width, pipe.top);
-                    ctx.strokeRect(pipe.x, pipe.bottom, pipe.width, canvas.height - pipe.bottom);
-                    
-                    // Pipe inner glow
-                    const gradientTop = ctx.createLinearGradient(pipe.x, 0, pipe.x + pipe.width, 0);
-                    gradientTop.addColorStop(0, 'rgba(5, 217, 232, 0.8)');
-                    gradientTop.addColorStop(1, 'rgba(0, 86, 120, 0.8)');
-                    
-                    const gradientBottom = ctx.createLinearGradient(pipe.x, pipe.bottom, pipe.x + pipe.width, pipe.bottom);
-                    gradientBottom.addColorStop(0, 'rgba(0, 86, 120, 0.8)');
-                    gradientBottom.addColorStop(1, 'rgba(5, 217, 232, 0.8)');
-                    
-                    ctx.fillStyle = gradientTop;
-                    ctx.fillRect(pipe.x + 2, pipe.top - 10, pipe.width - 4, 10);
-                    
-                    ctx.fillStyle = gradientBottom;
-                    ctx.fillRect(pipe.x + 2, pipe.bottom, pipe.width - 4, 10);
-                });
-            }
-            
-            // Draw cyberpunk background
-            function drawBackground() {
-                // Gradient sky
-                const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-                gradient.addColorStop(0, '#1a1a2e');
-                gradient.addColorStop(0.5, '#16213e');
-                gradient.addColorStop(1, '#0f3460');
-                ctx.fillStyle = gradient;
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-                
-                // Stars
-                ctx.fillStyle = 'white';
-                for (let i = 0; i < 100; i++) {
-                    const x = Math.random() * canvas.width;
-                    const y = Math.random() * canvas.height * 0.7;
-                    const size = Math.random() * 1.5;
-                    ctx.fillRect(x, y, size, size);
+                // Add windows to buildings
+                for (let j = 0; j < 5; j++) {
+                    buildings[i].windows.push({
+                        x: Math.random() * buildings[i].width,
+                        y: Math.random() * buildings[i].height,
+                        size: 5 + Math.random() * 10,
+                        lit: Math.random() > 0.3
+                    });
                 }
-                
-                // City buildings
-                buildings.forEach(building => {
-                    // Main building
-                    ctx.fillStyle = building.color;
-                    ctx.fillRect(building.x, canvas.height - building.height, building.width, building.height);
-                    
-                    // Windows
-                    ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
-                    const windowRows = Math.floor(building.height / 30);
-                    const windowCols = Math.floor(building.width / 20);
-                    
-                    for (let row = 0; row < windowRows; row++) {
-                        for (let col = 0; col < windowCols; col++) {
-                            if (Math.random() > 0.3) { // Random windows
-                                ctx.fillRect(
-                                    building.x + 10 + col * 20,
-                                    canvas.height - building.height + 10 + row * 30,
-                                    10,
-                                    15
-                                );
-                            }
-                        }
-                    }
-                    
-                    // Move buildings for parallax effect
-                    building.x -= gameSpeed * 0.5;
-                    if (building.x + building.width < 0) {
-                        building.x = canvas.width;
-                    }
-                });
-                
-                // Neon signs
-                neonSigns.forEach(sign => {
-                    ctx.font = '20px "Press Start 2P"';
-                    ctx.fillStyle = sign.color;
-                    ctx.textAlign = 'center';
-                    ctx.fillText(sign.text, sign.x, sign.y);
-                    
-                    // Glow effect
-                    ctx.shadowColor = sign.color;
-                    ctx.shadowBlur = 10;
-                    ctx.fillText(sign.text, sign.x, sign.y);
-                    ctx.shadowBlur = 0;
-                    
-                    // Move signs
-                    sign.x -= gameSpeed * 0.3;
-                    if (sign.x < -50) {
-                        sign.x = canvas.width + 50;
-                    }
+            }
+            
+            // Stars for background
+            let stars = [];
+            for (let i = 0; i < 100; i++) {
+                stars.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    size: Math.random() * 2,
+                    opacity: Math.random()
                 });
             }
             
-            // Generate new pipes
-            function generatePipes() {
-                const minTop = 50;
-                const maxTop = canvas.height - pipeGap - 50;
-                const top = Math.random() * (maxTop - minTop) + minTop;
+            // Event listeners
+            startBtn.addEventListener('click', startGame);
+            restartBtn.addEventListener('click', startGame);
+            canvas.addEventListener('click', () => {
+                if (gameRunning) {
+                    bird.velocity = bird.jumpForce;
+                }
+            });
+            
+            // Start game function
+            function startGame() {
+                bird.y = canvas.height / 2;
+                bird.velocity = 0;
+                pipes = [];
+                score = 0;
+                gameSpeed = 2;
+                pipeGap = 180;
+                difficultyTimer = 0;
+                
+                startScreen.classList.add('hidden');
+                gameOverScreen.classList.add('hidden');
+                scoreDisplay.classList.remove('hidden');
+                scoreDisplay.textContent = '0';
+                
+                gameRunning = true;
+                requestAnimationFrame(gameLoop);
+            }
+            
+            // Game over function
+            function gameOver() {
+                gameRunning = false;
+                finalScore.textContent = `Score: ${score}`;
+                gameOverScreen.classList.remove('hidden');
+                scoreDisplay.classList.add('hidden');
+            }
+            
+            // Create new pipe
+            function createPipe() {
+                const minHeight = 50;
+                const maxHeight = canvas.height - pipeGap - minHeight;
+                const height = minHeight + Math.random() * maxHeight;
                 
                 pipes.push({
                     x: canvas.width,
-                    top: top,
-                    bottom: top + pipeGap,
-                    width: 70,
+                    y: 0,
+                    width: 60,
+                    height: height,
+                    passed: false
+                });
+                
+                pipes.push({
+                    x: canvas.width,
+                    y: height + pipeGap,
+                    width: 60,
+                    height: canvas.height - height - pipeGap,
                     passed: false
                 });
             }
@@ -326,82 +261,127 @@
                 bird.velocity += bird.gravity;
                 bird.y += bird.velocity;
                 
-                // Keep bird within canvas
-                if (bird.y < 0) {
-                    bird.y = 0;
-                    bird.velocity = 0;
-                }
-                
-                if (bird.y > canvas.height - bird.height / 2) {
-                    bird.y = canvas.height - bird.height / 2;
-                    bird.velocity = 0;
+                // Check if bird hits the ground or ceiling
+                if (bird.y + bird.height > canvas.height || bird.y < 0) {
                     gameOver();
                 }
                 
-                // Generate pipes
+                // Generate new pipes
                 if (pipes.length === 0 || pipes[pipes.length - 1].x < canvas.width - pipeDistance) {
-                    generatePipes();
+                    createPipe();
                 }
                 
                 // Update pipes
-                for (let i = pipes.length - 1; i >= 0; i--) {
+                for (let i = 0; i < pipes.length; i++) {
                     pipes[i].x -= gameSpeed;
                     
-                    // Check collision
+                    // Check collision with bird
                     if (
-                        bird.x + bird.width / 2 > pipes[i].x &&
-                        bird.x - bird.width / 2 < pipes[i].x + pipes[i].width &&
-                        (bird.y - bird.height / 2 < pipes[i].top || bird.y + bird.height / 2 > pipes[i].bottom)
+                        bird.x + bird.width > pipes[i].x &&
+                        bird.x < pipes[i].x + pipes[i].width &&
+                        bird.y + bird.height > pipes[i].y &&
+                        bird.y < pipes[i].y + pipes[i].height
                     ) {
                         gameOver();
                     }
                     
-                    // Check if bird passed the pipe
+                    // Check if bird passed a pipe
                     if (!pipes[i].passed && bird.x > pipes[i].x + pipes[i].width) {
                         pipes[i].passed = true;
-                        score++;
-                        scoreDisplay.textContent = score;
-                        
-                        // Play score sound
-                        const scoreSound = new Audio('data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU...');
-                        scoreSound.volume = 0.2;
-                        scoreSound.play().catch(e => {});
-                    }
-                    
-                    // Remove off-screen pipes
-                    if (pipes[i].x + pipes[i].width < 0) {
-                        pipes.splice(i, 1);
+                        if (i % 2 === 0) { // Only count once per pipe pair
+                            score++;
+                            scoreDisplay.textContent = score;
+                        }
                     }
                 }
                 
-                // Gradually increase difficulty after initial period
-                difficultyTimer += 16; // Assuming 60fps, each frame is ~16ms
-                if (difficultyTimer > difficultyInterval) {
-                    gameSpeed = Math.min(gameSpeed + 0.1, 3.5);
-                    pipeGap = Math.max(pipeGap - 5, 150);
-                    pipeDistance = Math.max(pipeDistance - 5, 150);
+                // Remove pipes that are off screen
+                pipes = pipes.filter(pipe => pipe.x + pipe.width > 0);
+                
+                // Increase difficulty over time
+                difficultyTimer += 16; // Assuming 60fps
+                if (difficultyTimer >= difficultyInterval) {
+                    gameSpeed += 0.5;
+                    pipeGap = Math.max(120, pipeGap - 10);
+                    difficultyTimer = 0;
                 }
             }
             
-            // Draw everything
+            // Draw game elements
             function draw() {
+                // Clear canvas
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
-                drawBackground();
-                drawPipes();
-                drawBird();
                 
-                // Draw HUD
-                ctx.font = '20px "Press Start 2P"';
-                ctx.fillStyle = '#ff2a6d';
-                ctx.textAlign = 'left';
-                ctx.fillText(`SCORE: ${score}`, 20, 30);
+                // Draw night sky gradient
+                const skyGradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+                skyGradient.addColorStop(0, '#0f0e17');
+                skyGradient.addColorStop(1, '#16213e');
+                ctx.fillStyle = skyGradient;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
                 
-                // Draw difficulty timer
-                const remainingTime = Math.max(0, (difficultyInterval - difficultyTimer) / 1000).toFixed(1);
-                ctx.fillText(`EASY: ${remainingTime}s`, 20, 60);
+                // Draw stars
+                ctx.fillStyle = 'white';
+                stars.forEach(star => {
+                    ctx.globalAlpha = star.opacity;
+                    ctx.fillRect(star.x, star.y, star.size, star.size);
+                });
+                ctx.globalAlpha = 1;
+                
+                // Draw buildings
+                buildings.forEach(building => {
+                    // Draw building
+                    ctx.fillStyle = building.color;
+                    ctx.fillRect(building.x, canvas.height - building.height, building.width, building.height);
+                    
+                    // Draw windows
+                    building.windows.forEach(window => {
+                        ctx.fillStyle = window.lit ? '#ffff00' : '#333333';
+                        ctx.fillRect(
+                            building.x + window.x,
+                            canvas.height - building.height + window.y,
+                            window.size,
+                            window.size
+                        );
+                    });
+                });
+                
+                // Draw pipes
+                ctx.fillStyle = '#05d9e8';
+                pipes.forEach(pipe => {
+                    // Pipe gradient
+                    const pipeGradient = ctx.createLinearGradient(pipe.x, pipe.y, pipe.x + pipe.width, pipe.y);
+                    pipeGradient.addColorStop(0, '#05d9e8');
+                    pipeGradient.addColorStop(1, '#005678');
+                    
+                    ctx.fillStyle = pipeGradient;
+                    ctx.fillRect(pipe.x, pipe.y, pipe.width, pipe.height);
+                    
+                    // Pipe borders
+                    ctx.strokeStyle = '#ff2a6d';
+                    ctx.lineWidth = 3;
+                    ctx.strokeRect(pipe.x, pipe.y, pipe.width, pipe.height);
+                });
+                
+                // Draw bird
+                ctx.fillStyle = bird.color;
+                ctx.fillRect(bird.x, bird.y, bird.width, bird.height);
+                
+                // Draw bird eye
+                ctx.fillStyle = 'white';
+                ctx.fillRect(bird.x + 10, bird.y + 10, 8, 8);
+                ctx.fillStyle = 'black';
+                ctx.fillRect(bird.x + 14, bird.y + 12, 4, 4);
+                
+                // Draw bird beak
+                ctx.fillStyle = '#ffff00';
+                ctx.beginPath();
+                ctx.moveTo(bird.x + bird.width, bird.y + 15);
+                ctx.lineTo(bird.x + bird.width + 10, bird.y + 20);
+                ctx.lineTo(bird.x + bird.width, bird.y + 25);
+                ctx.fill();
             }
             
-            // Game loop
+            // Main game loop
             function gameLoop() {
                 if (gameRunning) {
                     update();
@@ -410,84 +390,9 @@
                 }
             }
             
-            // Start game
-            function startGame() {
-                startScreen.classList.add('hidden');
-                gameOverScreen.classList.add('hidden');
-                scoreDisplay.classList.remove('hidden');
-                
-                // Reset game state
-                bird.y = canvas.height / 2;
-                bird.velocity = 0;
-                pipes = [];
-                score = 0;
-                scoreDisplay.textContent = '0';
-                gameSpeed = 2;
-                pipeGap = 180;
-                pipeDistance = 200;
-                difficultyTimer = 0;
-                
-                gameRunning = true;
-                gameLoop();
-            }
-            
-            // Game over
-            function gameOver() {
-                gameRunning = false;
-                gameOverScreen.classList.remove('hidden');
-                scoreDisplay.classList.add('hidden');
-                finalScore.textContent = `SCORE: ${score}`;
-                
-                // Play explosion sound
-                const explosionSound = new Audio('data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU...');
-                explosionSound.volume = 0.3;
-                explosionSound.play().catch(e => {});
-            }
-            
-            // Event listeners
-            startBtn.addEventListener('click', startGame);
-            restartBtn.addEventListener('click', startGame);
-            
-            // Jump on click/tap
-            canvas.addEventListener('click', () => {
-                if (gameRunning) {
-                    bird.velocity = bird.jumpForce;
-                    
-                    // Play jump sound
-                    const jumpSound = new Audio('data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU...');
-                    jumpSound.volume = 0.2;
-                    jumpSound.play().catch(e => {});
-                }
-            });
-            
-            // Keyboard controls
-            document.addEventListener('keydown', (e) => {
-                if (e.code === 'Space') {
-                    if (!gameRunning && !startScreen.classList.contains('hidden')) {
-                        startGame();
-                    } else if (gameRunning) {
-                        bird.velocity = bird.jumpForce;
-                        
-                        // Play jump sound
-                        const jumpSound = new Audio('data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU...');
-                        jumpSound.volume = 0.2;
-                        jumpSound.play().catch(e => {});
-                    }
-                }
-            });
-            
-            // Mobile touch controls
-            canvas.addEventListener('touchstart', (e) => {
-                e.preventDefault();
-                if (gameRunning) {
-                    bird.velocity = bird.jumpForce;
-                    
-                    // Play jump sound
-                    const jumpSound = new Audio('data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU...');
-                    jumpSound.volume = 0.2;
-                    jumpSound.play().catch(e => {});
-                }
-            });
+            // Initial draw
+            draw();
         });
     </script>
+<p style="border-radius: 8px; text-align: center; font-size: 12px; color: #fff; margin-top: 16px;position: fixed; left: 8px; bottom: 8px; z-index: 10; background: rgba(0, 0, 0, 0.8); padding: 4px 8px;">Made with <img src="https://enzostvs-deepsite.hf.space/logo.svg" alt="DeepSite Logo" style="width: 16px; height: 16px; vertical-align: middle;display:inline-block;margin-right:3px;filter:brightness(0) invert(1);"><a href="https://enzostvs-deepsite.hf.space" style="color: #fff;text-decoration: underline;" target="_blank" >DeepSite</a> - 🧬 <a href="https://enzostvs-deepsite.hf.space?remix=Ricksfred/gblend-flappy2" style="color: #fff;text-decoration: underline;" target="_blank" >Remix</a></p></body>
 </html>
