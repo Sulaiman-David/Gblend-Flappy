@@ -149,14 +149,14 @@
                 width: 40,
                 height: 30,
                 velocity: 0,
-                gravity: 0.3,  // Reduced gravity for slower falling
-                jumpForce: -6,  // Reduced jump height
+                gravity: 0.2,  // Reduced gravity for slower falling
+                jumpForce: -10,  // Reduced jump height
                 color: '#ff2a6d'
             };
             
             let pipes = [];
             let score = 0;
-            let gameSpeed = 2;  // Reduced horizontal speed
+            let gameSpeed = 1.5;  // Reduced horizontal speed
             let pipeGap = 180;  // Increased gap between pipes
             let pipeDistance = 200;  // Reduced distance between pipes
             let gameRunning = false;
@@ -211,7 +211,7 @@
                 bird.velocity = 0;
                 pipes = [];
                 score = 0;
-                gameSpeed = 2;
+                gameSpeed = 1.5;
                 pipeGap = 180;
                 difficultyTimer = 0;
                 
@@ -392,6 +392,53 @@
             
             // Initial draw
             draw();
+            // Wallet UI -->
+<div id="walletSection" class="absolute top-4 right-4 text-right z-50">
+    <button id="connectWalletBtn" class="cyberpunk-btn neon-border mb-2">Connect Wallet</button>
+    <div id="walletAddress" class="text-xs text-cyan-300 hidden break-words"></div>
+</div>
+
+//<!-- Add ethers.js from CDN -->
+<script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+<script>
+    const connectWalletBtn = document.getElementById('connectWalletBtn');
+    const walletAddressDiv = document.getElementById('walletAddress');
+
+    connectWalletBtn.addEventListener('click', async () => {
+        if (typeof window.ethereum !== 'undefined') {
+            try {
+                // Request wallet connection
+                const provider = new ethers.providers.Web3Provider(window.ethereum);
+                await provider.send("eth_requestAccounts", []);
+                const signer = provider.getSigner();
+                const address = await signer.getAddress();
+
+                // Show connected address
+                walletAddressDiv.textContent = `Wallet: ${address}`;
+                walletAddressDiv.classList.remove('hidden');
+                connectWalletBtn.classList.add('hidden');
+
+                // Optional: ensure Fluent chain is selected
+                await window.ethereum.request({
+                    method: 'wallet_addEthereumChain',
+                    params: [{
+                        chainId: '0x5211', // 20993 in hex
+                        chainName: 'Fluent Testnet',
+                        rpcUrls: ['https://rpc.dev.gblend.xyz'],
+                        nativeCurrency: {
+                            name: 'Fluent',
+                            symbol: 'FLNT',
+                            decimals: 18
+                        },
+                        blockExplorerUrls: ['https://explorer.gblend.xyz']
+                    }]
+                });
+            } catch (error) {
+                console.error("Wallet connection error:", error);
+            }
+        } else {
+            alert('Please install MetaMask or a compatible wallet.');
+        }
         });
     </script>
 </html>
