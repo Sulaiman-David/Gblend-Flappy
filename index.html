@@ -149,14 +149,14 @@
                 width: 40,
                 height: 30,
                 velocity: 0,
-                gravity: 0.2,  // Reduced gravity for slower falling
-                jumpForce: -6,  // Reduced jump height
+                gravity: 0.1,  // Reduced gravity for slower falling
+                jumpForce: -3,  // Reduced jump height
                 color: '#ff2a6d'
             };
             
             let pipes = [];
             let score = 0;
-            let gameSpeed = 1.5;  // Reduced horizontal speed
+            let gameSpeed = 1;  // Reduced horizontal speed
             let pipeGap = 210;  // Increased gap between pipes
             let pipeDistance = 200;  // Reduced distance between pipes
             let gameRunning = false;
@@ -211,7 +211,7 @@
                 bird.velocity = 0;
                 pipes = [];
                 score = 0;
-                gameSpeed = 1.5;
+                gameSpeed = 1;
                 pipeGap = 180;
                 difficultyTimer = 0;
                 
